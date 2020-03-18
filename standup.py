@@ -21,7 +21,10 @@ def send_email(msg_lst):
     message = "Subject: PGP Daily Standup \n\nPGP Daily Standup: \n\n{}".format("\n\n".join(ascii_msg_lst))
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         server.login(config.gmail_username, config.gmail_password)
-        server.sendmail(sender_email, config.to_emails, message)
+        if config.debug:
+            server.sendmail(sender_email, sender_email, message)
+        else:
+            server.sendmail(sender_email, config.to_emails, message)
 
 def slack_message(message, channel=config.slack_channel):
     response = sc.chat_postMessage(channel=channel,text=message, username='Standup Bot', icon_emoji=':robot_face:')
@@ -47,9 +50,9 @@ if __name__ == "__main__":
     with open('thread_ts_pickle', 'wb') as f:
         pickle.dump(thread_ts, f)
 
-    time.sleep(5400) # wait 1.5 hours
+    time.sleep(54 if config.debug else 5400) # wait 1.5 hours
     slack_message("Reminder - only 30 minutes left to submit your standup report.")
-    time.sleep(1800) # wait .5 hours
+    time.sleep(18 if config.debug else 1800) # wait .5 hours
     slack_message("Responses are closed for today - emailing Baxter the responses")
 
     # reads the list of standup reports collected by listener.py
