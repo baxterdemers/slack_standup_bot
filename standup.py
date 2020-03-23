@@ -33,7 +33,7 @@ def sends_email(msg_lst):
     msg = MIMEText("Subject: PGP Daily Standup \n\nPGP Daily Standup: \n\n{}".format("\n\n".join(ascii_msg_lst)))
     msg['Subject'] = "subject line"
     sender = config.gmail_username
-    recipients = [config.gmail_username, 'bdemers@princeton.edu'] if config.debug else ", ".join(config.to_emails)
+    recipients =  ", ".join([config.gmail_username, 'bdemers@princeton.edu'] if config.debug else config.to_emails)
     msg['From'] = sender
     msg['To'] = recipients
     port = 465
