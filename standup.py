@@ -23,7 +23,7 @@ def send_standup_email(msg_lst):
     msg = MIMEText("PGP Daily Standup: \n\n{}".format("\n\n".join(ascii_msg_lst)))
     msg['Subject'] = "PGP Daily Standup - {}".format(today_str)
     sender = config.gmail_username
-    recipient_lst = [config.gmail_username, 'bdemers@princeton.edu', 'baxter.demers@gmail.com'] if config.debug else config.to_emails
+    recipient_lst = [config.gmail_username, 'bdemers@princeton.edu', 'baxter.demers@gmail.com'] if config.debug else config.standup_to_emails
     recipients =  ", ".join(recipient_lst)
     print("recipients: ", recipients)
     msg['From'] = sender
@@ -47,7 +47,7 @@ def send_weekly_email():
     """)
     msg['Subject'] = "Weekly email for {}".format(today_str)
     sender = config.gmail_username
-    recipient_lst = [config.gmail_username, 'bdemers@princeton.edu', 'baxter.demers@gmail.com'] if config.debug else config.to_emails
+    recipient_lst = [config.gmail_username, 'bdemers@princeton.edu', 'baxter.demers@gmail.com'] if config.debug else config.weekly_to_emails
     recipients =  ", ".join(recipient_lst)
     msg['From'] = sender
     msg['To'] = recipients
