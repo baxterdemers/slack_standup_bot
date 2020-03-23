@@ -41,20 +41,17 @@ def record_msg(**payload):
         pass
     if 'thread_ts' in data and data['thread_ts'] == thread_ts:
         _, real_name = getUsername(data['user'])
-        user_standup = "{}: {}".format(real_name, data.get('text', []))
-        print(user_standup)
+        user_standup = data.get('text', [])
         with open('msg_lst', 'rb') as f:
-            msg_lst = pickle.load(f)
-        print("previous msg_lst: ", msg_lst)
-        msg_lst.append(user_standup)
-        print("current msg_lst: ", msg_lst)
+            real_nameToStandup = pickle.load(f)
+        real_nameToStandup[real_name] = user_standup
         with open('msg_lst', 'wb') as f:
-            pickle.dump(msg_lst, f)
+            pickle.dump(real_nameToStandup, f)
 
 def run():
     print("running proc")
     with open('msg_lst', 'wb') as f:
-        var = []
+        var = {}
         pickle.dump(var, f)
     rtm_client = slack.RTMClient(token=config.slack_token)
     print("starting lister... ")
