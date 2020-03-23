@@ -4,6 +4,7 @@ import time
 import smtplib
 import ssl
 import pickle
+from email.mime.text import MIMEText
 
 import slack
 
@@ -26,6 +27,20 @@ def send_email(msg_lst):
             server.sendmail(sender_email, sender_email, message)
         else:
             server.sendmail(sender_email, config.to_emails, message)
+
+def sends_email(msg_lst):
+    ascii_msg_lst = list(map(conformToAscii, msg_lst)) #necessary to use the SMTP_SSL mail server
+    msg = MIMEText("Subject: PGP Daily Standup \n\nPGP Daily Standup: \n\n{}".format("\n\n".join(ascii_msg_lst)))
+    msg['Subject'] = "subject line"
+    sender = config.gmail_username
+    recipients = [config.gmail_username, 'bdemers@princeton.edu'] if config.debug else ", ".join(config.to_emails)
+    msg['From'] = sender
+    msg['To'] = recipients
+    port = 465
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+        server.login(config.gmail_username, config.gmail_password)
+        server.sendmail(sender, recipients, msg.as_string())
 
 def slack_message(message, channel=config.slack_channel):
     response = sc.chat_postMessage(channel=channel,text=message, username='Standup Bot', icon_emoji=':robot_face:')
@@ -61,5 +76,5 @@ if __name__ == "__main__":
         msg_lst = pickle.load(f)
         print("msg_lst : ", msg_lst)
 
-    send_email(msg_lst)
+    sends_email(msg_lst)
 
