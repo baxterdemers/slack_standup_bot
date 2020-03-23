@@ -33,7 +33,8 @@ def sends_email(msg_lst):
     msg = MIMEText("Subject: PGP Daily Standup \n\nPGP Daily Standup: \n\n{}".format("\n\n".join(ascii_msg_lst)))
     msg['Subject'] = "subject line"
     sender = config.gmail_username
-    recipients =  ", ".join([config.gmail_username, 'bdemers@princeton.edu', 'baxter.demers@gmail.com'] if config.debug else config.to_emails)
+    recipient_lst = [config.gmail_username, 'bdemers@princeton.edu', 'baxter.demers@gmail.com'] if config.debug else config.to_emails
+    recipients =  ", ".join(recipient_lst)
     print("recipients: ", recipients)
     msg['From'] = sender
     msg['To'] = recipients
@@ -41,7 +42,7 @@ def sends_email(msg_lst):
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         server.login(config.gmail_username, config.gmail_password)
-        server.sendmail(sender, recipients, msg.as_string())
+        server.sendmail(sender, recipient_lst, msg.as_string())
 
 def slack_message(message, channel=config.slack_channel):
     response = sc.chat_postMessage(channel=channel,text=message, username='Standup Bot', icon_emoji=':robot_face:')
