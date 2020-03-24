@@ -82,7 +82,7 @@ if __name__ == "__main__":
         pickle.dump(thread_ts, f)
 
     time.sleep(54 if config.debug else 5400) # wait 1.5 hours
-    slack_message("Reminder - only 30 minutes left to submit your standup report.")
+    slack_message("Reminder - only 30 minutes left to submit your standup report. <@UT31T0LNB>")
     time.sleep(18 if config.debug else 1800) # wait .5 hours
     slack_message("Responses are closed for today - emailing Baxter the responses")
 
