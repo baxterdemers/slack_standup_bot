@@ -45,13 +45,13 @@ def record_msg(**payload):
             print("reply: ", data['message']['text'])
             data = data['message']
     if 'thread_ts' in data and data['thread_ts'] == thread_ts:
-        _, real_name = getUsername(data['user'])
+        real_name = data['user']
         user_standup = data.get('text', [])
         with open('msg_lst', 'rb') as f:
-            real_nameToStandup = pickle.load(f)
-        real_nameToStandup[real_name] = user_standup
+            member_ID_to_standup = pickle.load(f)
+        member_ID_to_standup[real_name] = user_standup
         with open('msg_lst', 'wb') as f:
-            pickle.dump(real_nameToStandup, f)
+            pickle.dump(member_ID_to_standup, f)
 
 def run():
     print("running proc")

@@ -8,8 +8,8 @@ from email.mime.text import MIMEText
 from datetime import date
 
 import slack
-
 import config
+from listener import getUsername
 
 today = date.today()
 today_str = today.strftime("%B %d, %Y")
@@ -65,8 +65,8 @@ def slack_message(message, channel=config.slack_channel):
 if __name__ == "__main__":
     #reset the message file (to be used for persistent asynchronous communication with the listener.py proccess)
     with open('msg_lst', 'wb') as f:
-        real_nameToStandup = {}
-        pickle.dump(real_nameToStandup, f)
+        member_ID_to_standup = {}
+        pickle.dump(member_ID_to_standup, f)
 
     sc = slack.WebClient(config.slack_token)
 
@@ -82,15 +82,20 @@ if __name__ == "__main__":
         pickle.dump(thread_ts, f)
 
     time.sleep(54 if config.debug else 5400) # wait 1.5 hours
-    slack_message("Reminder - only 30 minutes left to submit your standup report. <@UT31T0LNB>")
+    with open('msg_lst', 'rb') as f:
+        member_ID_to_standup = pickle.load(f)
+        missing_member_ID_set = set(config.standup_member_IDs.difference(member_ID_to_standup.keys()))
+    if len(missing_member_ID_set) > 0:
+        slack_at_messages = " ".join(['<@{}>'.format(member_ID) for member_ID in missing_member_ID_set])
+        slack_message("Reminder - only 30 minutes left to submit your standup report. " + slack_at_messages)
     time.sleep(18 if config.debug else 1800) # wait .5 hours
     slack_message("Responses are closed for today - emailing Baxter the responses")
 
     # reads the list of standup reports collected by listener.py
     with open('msg_lst', 'rb') as f:
-        real_nameToStandup = pickle.load(f)
-        print("msg_lst : ", real_nameToStandup)
+        member_ID_to_standup = pickle.load(f)
+        print("msg_lst : ", member_ID_to_standup)
 
-    msg_lst = ["{}: {}".format(k, v) for k,v in real_nameToStandup.items()]
+    msg_lst = ["{}: {}".format(getUsername(member_ID)[1], standup) for member_ID,standup in member_ID_to_standup.items()]
     send_standup_email(msg_lst)
 
