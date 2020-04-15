@@ -39,6 +39,11 @@ def record_msg(**payload):
         print("Thread_TS = ", thread_ts)
     except:
         pass
+    print(data.get('text', []))
+    if "subtype" in data:
+        if data["subtype"] == "message_changed":
+            print("reply: ", data['message']['text'])
+            data = data['message']
     if 'thread_ts' in data and data['thread_ts'] == thread_ts:
         _, real_name = getUsername(data['user'])
         user_standup = data.get('text', [])
